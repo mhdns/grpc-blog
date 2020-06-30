@@ -1,9 +1,6 @@
 package main
 
 import (
-	"blog/blogpb"
-	"context"
-	"fmt"
 	"log"
 
 	"google.golang.org/grpc"
@@ -16,16 +13,16 @@ func main() {
 	}
 	defer conn.Close()
 
-	testCall(conn)
+	// testCall(conn)
 }
 
-func testCall(conn *grpc.ClientConn) {
-	c := blogpb.NewGreetingsClient(conn)
+// func testCall(conn *grpc.ClientConn) {
+// 	c := blogpb.NewGreetingsClient(conn)
 
-	res, err := c.SayHello(context.Background(), &blogpb.SayHelloRequest{})
-	if err != nil {
-		fmt.Printf("error getting response: %v\n", err)
-	}
+// 	res, err := c.SayHello(context.Background(), &blogpb.SayHelloRequest{})
+// 	if err != nil {
+// 		fmt.Printf("error getting response: %v\n", err)
+// 	}
 
-	fmt.Println(res.GetMessage().GetText())
-}
+// 	fmt.Println(res.GetMessage().GetText())
+// }
