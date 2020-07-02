@@ -79,8 +79,31 @@ func (s *server) GetBlog(ctx context.Context, req *blogpb.GetBlogRequest) (*blog
 	}, nil
 }
 
-func (*server) UpdateBlog(ctx context.Context, req *blogpb.UpdateBlogRequest) (*blogpb.UpdateBlogResponse, error) {
-	return nil, nil
+func (s *server) UpdateBlog(ctx context.Context, req *blogpb.UpdateBlogRequest) (*blogpb.UpdateBlogResponse, error) {
+	collection := s.client.Database("test").Collection("blogs")
+
+	objID, err := primitive.ObjectIDFromHex(req.GetBlogId())
+	if err != nil {
+		fmt.Printf("invalid objectId: %v", err)
+		return nil, err
+	}
+
+	filter := bson.M{"_id": objID}
+
+	update := bson.D{
+		{"$set", bson.D{{"title", req.GetBlog().GetTitle},
+			{"post", req.GetBlog().GetPost}},
+		}}
+
+	result, err := collection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		fmt.Printf("unable to get document: %v", err)
+		return nil, err
+	}
+
+	fmt.Println(result)
+
+	return &blogpb.UpdateBlogResponse{}, nil
 }
 
 func (*server) DeleteBlog(ctx context.Context, req *blogpb.DeleteBlogRequest) (*blogpb.DeleteBlogResponse, error) {

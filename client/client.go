@@ -16,18 +16,21 @@ func main() {
 	}
 	defer conn.Close()
 
-	// req := &blogpb.CreateBlogRequest{
-	// 	Blog: &blogpb.Blog{
-	// 		Title: "My First Blog",
-	// 		Post:  "This is my first ever blog. I hope everyone likes it. If you get to read it, good for you",
-	// 	},
-	// }
+	req := &blogpb.UpdateBlogRequest{
+		BlogId: "5efc038b73cd517b65e735ed",
+		Blog: &blogpb.Blog{
+			Title: "My First Blog Edited",
+			Post:  "This is my first ever blog. I hope everyone likes it. If you get to read it, good for you!!!!!",
+		},
+	}
 
 	// createBlog(conn, req)
 
-	getBlog(conn, &blogpb.GetBlogRequest{
-		BlogId: "5efc038b73cd517b65e735ed",
-	})
+	// getBlog(conn, &blogpb.GetBlogRequest{
+	// 	BlogId: "5efc038b73cd517b65e735ed",
+	// })
+
+	updateBlog(conn, req)
 
 }
 
@@ -46,6 +49,17 @@ func getBlog(conn *grpc.ClientConn, req *blogpb.GetBlogRequest) error {
 	c := blogpb.NewBlogServiceClient(conn)
 
 	res, err := c.GetBlog(context.Background(), req)
+	if err != nil {
+		return err
+	}
+	fmt.Println(res)
+	return nil
+}
+
+func updateBlog(conn *grpc.ClientConn, req *blogpb.UpdateBlogRequest) error {
+	c := blogpb.NewBlogServiceClient(conn)
+
+	res, err := c.UpdateBlog(context.Background(), req)
 	if err != nil {
 		return err
 	}
