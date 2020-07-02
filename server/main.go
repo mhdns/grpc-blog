@@ -5,17 +5,56 @@ import (
 	"context"
 	"log"
 	"net"
+	"time"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
 )
+
+type blogResponse struct {
+	ID    primitive.ObjectID
+	Title string
+	Date  string
+	Post  string
+}
+
+type blog struct {
+	Title string
+	Date  string
+	Post  string
+}
 
 type server struct {
 	client *mongo.Client
 }
 
-func (*server) CreateBlog(ctx context.Context, req *blogpb.CreateBlogRequest) (*blogpb.CreateBlogResponse, error) {
-	return nil, nil
+func (s *server) CreateBlog(ctx context.Context, req *blogpb.CreateBlogRequest) (*blogpb.CreateBlogResponse, error) {
+	collection := s.client.Database("test").Collection("blogs")
+	currentTime := time.Now().Format("Mon Jan 2 15:04:05 MST 2006")
+	input := blog{
+		Title: req.GetBlog().Title,
+		Date:  currentTime,
+		Post:  req.GetBlog().GetPost(),
+	}
+
+	insertResult, err := collection.InsertOne(context.TODO(), input)
+	if err != nil {
+		return nil, err
+	}
+
+	result := insertResult.InsertedID.(primitive.ObjectID).Hex()
+
+	return &blogpb.CreateBlogResponse{
+		Blog: &blogpb.Blog{
+			Id:    result,
+			Title: input.Title,
+			Date:  input.Date,
+			Post:  input.Post,
+		},
+		Msg:     "Blog created Successfully",
+		Success: true,
+	}, nil
 }
 
 func (*server) GetBlog(ctx context.Context, req *blogpb.GetBlogRequest) (*blogpb.GetBlogResponse, error) {
