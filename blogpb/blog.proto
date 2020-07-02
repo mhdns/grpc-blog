@@ -27,7 +27,10 @@ message GetBlogResponse {
   bool success = 3;
 }
 
-message UpdateBlogRequest { string blogId = 1; }
+message UpdateBlogRequest {
+  string blogId = 1;
+  Blog blog = 2;
+}
 
 message UpdateBlogResponse {
   Blog blog = 1;
