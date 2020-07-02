@@ -16,16 +16,19 @@ func main() {
 	}
 	defer conn.Close()
 
-	req := &blogpb.CreateBlogRequest{
-		Blog: &blogpb.Blog{
-			Title: "My First Blog",
-			Post:  "This is my first ever blog. I hope everyone likes it. If you get to read it, good for you",
-		},
-	}
+	// req := &blogpb.CreateBlogRequest{
+	// 	Blog: &blogpb.Blog{
+	// 		Title: "My First Blog",
+	// 		Post:  "This is my first ever blog. I hope everyone likes it. If you get to read it, good for you",
+	// 	},
+	// }
 
-	createBlog(conn, req)
+	// createBlog(conn, req)
 
-	// testCall(conn)
+	getBlog(conn, &blogpb.GetBlogRequest{
+		BlogId: "5efc038b73cd517b65e735ed",
+	})
+
 }
 
 func createBlog(conn *grpc.ClientConn, req *blogpb.CreateBlogRequest) error {
@@ -39,13 +42,13 @@ func createBlog(conn *grpc.ClientConn, req *blogpb.CreateBlogRequest) error {
 	return nil
 }
 
-// func testCall(conn *grpc.ClientConn) {
-// 	c := blogpb.NewGreetingsClient(conn)
+func getBlog(conn *grpc.ClientConn, req *blogpb.GetBlogRequest) error {
+	c := blogpb.NewBlogServiceClient(conn)
 
-// 	res, err := c.SayHello(context.Background(), &blogpb.SayHelloRequest{})
-// 	if err != nil {
-// 		fmt.Printf("error getting response: %v\n", err)
-// 	}
-
-// 	fmt.Println(res.GetMessage().GetText())
-// }
+	res, err := c.GetBlog(context.Background(), req)
+	if err != nil {
+		return err
+	}
+	fmt.Println(res)
+	return nil
+}

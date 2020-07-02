@@ -3,21 +3,16 @@ package main
 import (
 	"blog/blogpb"
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
 )
-
-type blogResponse struct {
-	ID    primitive.ObjectID
-	Title string
-	Date  string
-	Post  string
-}
 
 type blog struct {
 	Title string
@@ -57,8 +52,31 @@ func (s *server) CreateBlog(ctx context.Context, req *blogpb.CreateBlogRequest) 
 	}, nil
 }
 
-func (*server) GetBlog(ctx context.Context, req *blogpb.GetBlogRequest) (*blogpb.GetBlogResponse, error) {
-	return nil, nil
+func (s *server) GetBlog(ctx context.Context, req *blogpb.GetBlogRequest) (*blogpb.GetBlogResponse, error) {
+	collection := s.client.Database("test").Collection("blogs")
+
+	objID, err := primitive.ObjectIDFromHex(req.GetBlogId())
+	if err != nil {
+		fmt.Printf("invalid objectId: %v", err)
+		return nil, err
+	}
+
+	result := new(blog)
+
+	err = collection.FindOne(context.TODO(), bson.M{"_id": objID}).Decode(result)
+	if err != nil {
+		fmt.Printf("unable to get document: %v", err)
+		return nil, err
+	}
+
+	return &blogpb.GetBlogResponse{
+		Blog: &blogpb.Blog{
+			Id:    req.GetBlogId(),
+			Title: result.Title,
+			Date:  result.Date,
+			Post:  result.Post,
+		},
+	}, nil
 }
 
 func (*server) UpdateBlog(ctx context.Context, req *blogpb.UpdateBlogRequest) (*blogpb.UpdateBlogResponse, error) {
