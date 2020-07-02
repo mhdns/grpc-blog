@@ -1,6 +1,9 @@
 package main
 
 import (
+	"blog/blogpb"
+	"context"
+	"fmt"
 	"log"
 
 	"google.golang.org/grpc"
@@ -13,7 +16,27 @@ func main() {
 	}
 	defer conn.Close()
 
+	req := &blogpb.CreateBlogRequest{
+		Blog: &blogpb.Blog{
+			Title: "My First Blog",
+			Post:  "This is my first ever blog. I hope everyone likes it. If you get to read it, good for you",
+		},
+	}
+
+	createBlog(conn, req)
+
 	// testCall(conn)
+}
+
+func createBlog(conn *grpc.ClientConn, req *blogpb.CreateBlogRequest) error {
+	c := blogpb.NewBlogServiceClient(conn)
+
+	res, err := c.CreateBlog(context.Background(), req)
+	if err != nil {
+		return err
+	}
+	fmt.Println(res)
+	return nil
 }
 
 // func testCall(conn *grpc.ClientConn) {
