@@ -97,17 +97,34 @@ func (s *server) UpdateBlog(ctx context.Context, req *blogpb.UpdateBlogRequest) 
 
 	result, err := collection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		fmt.Printf("unable to get document: %v", err)
+		fmt.Printf("unable to update document: %v", err)
 		return nil, err
 	}
 
-	fmt.Println(result)
+	fmt.Println(result.ModifiedCount)
 
 	return &blogpb.UpdateBlogResponse{}, nil
 }
 
-func (*server) DeleteBlog(ctx context.Context, req *blogpb.DeleteBlogRequest) (*blogpb.DeleteBlogResponse, error) {
-	return nil, nil
+func (s *server) DeleteBlog(ctx context.Context, req *blogpb.DeleteBlogRequest) (*blogpb.DeleteBlogResponse, error) {
+	collection := s.client.Database("test").Collection("blogs")
+
+	objID, err := primitive.ObjectIDFromHex(req.GetBlogId())
+	if err != nil {
+		fmt.Printf("invalid objectId: %v", err)
+		return nil, err
+	}
+
+	filter := bson.M{"_id": objID}
+
+	result, err := collection.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		fmt.Printf("unable to delete document: %v", err)
+		return nil, err
+	}
+
+	fmt.Println(result.DeletedCount)
+	return &blogpb.DeleteBlogResponse{}, nil
 }
 
 func main() {
@@ -124,6 +141,7 @@ func main() {
 
 	s := grpc.NewServer()
 	blogpb.RegisterBlogServiceServer(s, &server{client: client})
+	defer client.Disconnect(context.TODO())
 
 	err = s.Serve(li)
 	if err != nil {

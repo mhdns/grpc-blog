@@ -16,13 +16,13 @@ func main() {
 	}
 	defer conn.Close()
 
-	req := &blogpb.UpdateBlogRequest{
-		BlogId: "5efc038b73cd517b65e735ed",
-		Blog: &blogpb.Blog{
-			Title: "My First Blog Edited",
-			Post:  "This is my first ever blog. I hope everyone likes it. If you get to read it, good for you!!!!!",
-		},
-	}
+	// req := &blogpb.UpdateBlogRequest{
+	// 	BlogId: "5efc038b73cd517b65e735ee",
+	// 	Blog: &blogpb.Blog{
+	// 		Title: "My First Blog Edited",
+	// 		Post:  "This is my first ever blog. I hope everyone likes it. If you get to read it, good for you!!!!!",
+	// 	},
+	// }
 
 	// createBlog(conn, req)
 
@@ -30,7 +30,9 @@ func main() {
 	// 	BlogId: "5efc038b73cd517b65e735ed",
 	// })
 
-	updateBlog(conn, req)
+	//updateBlog(conn, req)
+
+	deleteBlog(conn, &blogpb.DeleteBlogRequest{BlogId: "5efc038b73cd517b65e735ee"})
 
 }
 
@@ -60,6 +62,17 @@ func updateBlog(conn *grpc.ClientConn, req *blogpb.UpdateBlogRequest) error {
 	c := blogpb.NewBlogServiceClient(conn)
 
 	res, err := c.UpdateBlog(context.Background(), req)
+	if err != nil {
+		return err
+	}
+	fmt.Println(res)
+	return nil
+}
+
+func deleteBlog(conn *grpc.ClientConn, req *blogpb.DeleteBlogRequest) error {
+	c := blogpb.NewBlogServiceClient(conn)
+
+	res, err := c.DeleteBlog(context.Background(), req)
 	if err != nil {
 		return err
 	}
