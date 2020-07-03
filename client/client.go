@@ -18,7 +18,7 @@ func main() {
 
 	req := &blogpb.CreateBlogRequest{
 		Blog: &blogpb.Blog{
-			Title: "Third Blog - Anas",
+			Title: "fourth Blog - Anas",
 			Post:  "This is my first ever blog. I hope everyone likes it. If you get to read it, good for you!!!!!",
 		},
 	}
