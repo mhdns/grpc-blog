@@ -16,15 +16,14 @@ func main() {
 	}
 	defer conn.Close()
 
-	// req := &blogpb.UpdateBlogRequest{
-	// 	BlogId: "5efc038b73cd517b65e735ee",
-	// 	Blog: &blogpb.Blog{
-	// 		Title: "My First Blog Edited",
-	// 		Post:  "This is my first ever blog. I hope everyone likes it. If you get to read it, good for you!!!!!",
-	// 	},
-	// }
+	req := &blogpb.CreateBlogRequest{
+		Blog: &blogpb.Blog{
+			Title: "Third Blog - Anas",
+			Post:  "This is my first ever blog. I hope everyone likes it. If you get to read it, good for you!!!!!",
+		},
+	}
 
-	// createBlog(conn, req)
+	createBlog(conn, req)
 
 	// getBlog(conn, &blogpb.GetBlogRequest{
 	// 	BlogId: "5efc038b73cd517b65e735ed",
@@ -32,7 +31,7 @@ func main() {
 
 	//updateBlog(conn, req)
 
-	deleteBlog(conn, &blogpb.DeleteBlogRequest{BlogId: "5efc038b73cd517b65e735ee"})
+	// deleteBlog(conn, &blogpb.DeleteBlogRequest{BlogId: "5efc038b73cd517b65e735ee"})
 
 }
 

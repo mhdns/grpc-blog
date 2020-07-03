@@ -1,7 +1,7 @@
 package main
 
 import (
-	"blog/blogpb"
+	"blog/server/blogpb"
 	"context"
 	"fmt"
 	"log"
