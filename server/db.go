@@ -1,26 +1,34 @@
 package main
 
 import (
-	"context"
+	"database/sql"
+	"fmt"
 
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	_ "github.com/lib/pq"
 )
 
-func dbConnect(URI string) (*mongo.Client, error) {
-	clientOptions := options.Client().ApplyURI(URI)
+type dbCredentials struct {
+	host     string
+	port     int
+	user     string
+	password string
+	dbname   string
+	sslmode  string
+}
 
-	// Connect to MongoDB
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+func dbConnect(dbCred dbCredentials) (*sql.DB, error) {
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		dbCred.host, dbCred.port, dbCred.user, dbCred.password, dbCred.dbname)
+
+	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		return nil, err
 	}
 
-	// Check the connection
-	err = client.Ping(context.TODO(), nil)
+	err = db.Ping()
 	if err != nil {
 		return nil, err
 	}
-
-	return client, nil
+	return db, nil
 }
