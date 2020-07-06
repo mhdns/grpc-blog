@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"database/sql"
 	"fmt"
+	"os"
 
 	_ "github.com/lib/pq"
 )
@@ -31,4 +33,29 @@ func dbConnect(dbCred dbCredentials) (*sql.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func readSQL(filename string) string {
+	file, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+
+	result := ""
+	for i, v := range lines {
+		if i == 0 {
+			result += v
+			continue
+		}
+		result += " " + v
+	}
+
+	return result
 }
