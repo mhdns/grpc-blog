@@ -4,6 +4,7 @@ import (
 	"blog/server/blogpb"
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"net"
 
@@ -53,6 +54,13 @@ func main() {
 		panic(err)
 	}
 	log.Println("Connected to DB!")
+
+	createBlogTable := readSQL("create_table.sql")
+
+	_, err = db.Exec(createBlogTable)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	li, err := net.Listen("tcp", ":5000")
 	if err != nil {
