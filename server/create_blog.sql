@@ -1,0 +1,1 @@
+INSERT INTO blog(title, create_date, post) VALUE ($1, $2, $3);
