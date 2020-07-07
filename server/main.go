@@ -22,8 +22,49 @@ type server struct {
 }
 
 func (s *server) CreateBlog(ctx context.Context, req *blogpb.CreateBlogRequest) (*blogpb.CreateBlogResponse, error) {
+	newTitle := req.GetBlog().GetTitle()
+	newPost := req.GetBlog().GetPost()
 
-	return &blogpb.CreateBlogResponse{}, nil
+	query := readSQL("create_blog.sql")
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+
+	row := stmt.QueryRowContext(context.Background(), newTitle, newPost)
+
+	var id, title, createdAt, post string
+
+	err = row.Scan(&id, &title, &createdAt, &post)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Remove later
+	rows, err := s.db.Query("Select * from blog;")
+	if err != nil {
+		fmt.Println("Error ", err)
+	}
+
+	for rows.Next() {
+		var id, title, createdAt, post string
+		if err := rows.Scan(&id, &title, &createdAt, &post); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(id, title, createdAt, post)
+	}
+
+	return &blogpb.CreateBlogResponse{
+		Blog: &blogpb.Blog{
+			Id:    id,
+			Title: title,
+			Date:  createdAt,
+			Post:  post,
+		},
+		Msg:     "blog created successfully",
+		Success: true,
+	}, nil
 }
 
 func (s *server) GetBlog(ctx context.Context, req *blogpb.GetBlogRequest) (*blogpb.GetBlogResponse, error) {
@@ -56,11 +97,11 @@ func main() {
 	log.Println("Connected to DB!")
 
 	createBlogTable := readSQL("create_table.sql")
-
 	_, err = db.Exec(createBlogTable)
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println("table created")
 
 	li, err := net.Listen("tcp", ":5000")
 	if err != nil {
