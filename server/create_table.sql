@@ -1,6 +1,6 @@
-CREATE TABLE IF NOT EXISTS blog(
+CREATE TABLE IF NOT EXISTS blog (
     id SERIAL,
     title VARCHAR(256),
-    create_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     post VARCHAR(256)
 );
