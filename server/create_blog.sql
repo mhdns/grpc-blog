@@ -1,1 +1,2 @@
-INSERT INTO blog(title, create_date, post) VALUE ($1, $2, $3);
+INSERT INTO blog (title, post) VALUES ($1, $2)
+RETURNING id, title, created_at, post;
