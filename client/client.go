@@ -18,11 +18,15 @@ func main() {
 
 	req := &blogpb.CreateBlogRequest{
 		Blog: &blogpb.Blog{
-			Title: "fourth Blog - Anas",
-			Post:  "This is my first ever blog. I hope everyone likes it. If you get to read it, good for you!!!!!",
+			Title: "First Blog - Anas",
+			Post:  "This is my first blog. I hope everyone likes it. If you get to read it, good for you!!!!!",
 		},
 	}
 
+	createBlog(conn, req)
+	createBlog(conn, req)
+	createBlog(conn, req)
+	createBlog(conn, req)
 	createBlog(conn, req)
 
 	// getBlog(conn, &blogpb.GetBlogRequest{
