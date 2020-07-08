@@ -9,6 +9,8 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type blog struct {
@@ -25,7 +27,7 @@ func (s *server) CreateBlog(ctx context.Context, req *blogpb.CreateBlogRequest) 
 	newTitle := req.GetBlog().GetTitle()
 	newPost := req.GetBlog().GetPost()
 
-	query := readSQL("create_blog.sql")
+	query := readSQL("queries/create_blog.sql")
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
 		log.Fatal(err)
@@ -68,8 +70,34 @@ func (s *server) CreateBlog(ctx context.Context, req *blogpb.CreateBlogRequest) 
 }
 
 func (s *server) GetBlog(ctx context.Context, req *blogpb.GetBlogRequest) (*blogpb.GetBlogResponse, error) {
+	getID := req.GetBlogId()
 
-	return &blogpb.GetBlogResponse{}, nil
+	query := readSQL("queries/get_blog.sql")
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "database error: %v", err.Error())
+	}
+	defer stmt.Close()
+
+	var id, title, createdAt, post string
+	err = stmt.QueryRowContext(context.Background(), getID).Scan(&id, &title, &createdAt, &post)
+	if err == sql.ErrNoRows {
+		fmt.Println(err)
+		return nil, status.Errorf(codes.NotFound, "blog with id %v not found: ", getID, err.Error())
+	} else if err != nil {
+		return nil, status.Errorf(codes.Internal, "database err: %v", err.Error())
+	}
+
+	return &blogpb.GetBlogResponse{
+		Blog: &blogpb.Blog{
+			Id:    id,
+			Title: title,
+			Date:  createdAt,
+			Post:  post,
+		},
+		Msg:     "fetched one blog successfully",
+		Success: true,
+	}, nil
 }
 
 func (s *server) UpdateBlog(ctx context.Context, req *blogpb.UpdateBlogRequest) (*blogpb.UpdateBlogResponse, error) {
@@ -96,7 +124,7 @@ func main() {
 	}
 	log.Println("Connected to DB!")
 
-	createBlogTable := readSQL("create_table.sql")
+	createBlogTable := readSQL("queries/create_table.sql")
 	_, err = db.Exec(createBlogTable)
 	if err != nil {
 		fmt.Println(err)

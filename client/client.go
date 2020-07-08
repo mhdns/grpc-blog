@@ -26,8 +26,8 @@ func main() {
 	createBlog(conn, req)
 	createBlog(conn, req)
 	createBlog(conn, req)
-	createBlog(conn, req)
-	createBlog(conn, req)
+	// getBlog(conn, &blogpb.GetBlogRequest{BlogId: "1"})
+	getBlog(conn, &blogpb.GetBlogRequest{BlogId: "10000"})
 
 	// getBlog(conn, &blogpb.GetBlogRequest{
 	// 	BlogId: "5efc038b73cd517b65e735ed",
@@ -54,10 +54,10 @@ func getBlog(conn *grpc.ClientConn, req *blogpb.GetBlogRequest) error {
 	c := blogpb.NewBlogServiceClient(conn)
 
 	res, err := c.GetBlog(context.Background(), req)
+	fmt.Println(res, err)
 	if err != nil {
 		return err
 	}
-	fmt.Println(res)
 	return nil
 }
 
