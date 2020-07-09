@@ -135,8 +135,25 @@ func (s *server) UpdateBlog(ctx context.Context, req *blogpb.UpdateBlogRequest) 
 }
 
 func (s *server) DeleteBlog(ctx context.Context, req *blogpb.DeleteBlogRequest) (*blogpb.DeleteBlogResponse, error) {
+	deleteID := req.GetBlogId()
 
-	return &blogpb.DeleteBlogResponse{}, nil
+	query := readSQL("queries/delete_blog.sql")
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "database error: %v", err.Error())
+	}
+	defer stmt.Close()
+
+	res, err := stmt.ExecContext(context.Background(), deleteID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "database error: %v", err.Error())
+	}
+	val, _ := res.RowsAffected()
+
+	return &blogpb.DeleteBlogResponse{
+		Msg:     fmt.Sprintf("successfully deleted %v rows", val),
+		Success: true,
+	}, nil
 }
 
 func main() {
