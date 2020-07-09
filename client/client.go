@@ -27,7 +27,15 @@ func main() {
 	createBlog(conn, req)
 	createBlog(conn, req)
 	// getBlog(conn, &blogpb.GetBlogRequest{BlogId: "1"})
-	getBlog(conn, &blogpb.GetBlogRequest{BlogId: "10000"})
+	getBlog(conn, &blogpb.GetBlogRequest{BlogId: "1"})
+
+	updateBlog(conn, &blogpb.UpdateBlogRequest{
+		BlogId: "1",
+		Blog: &blogpb.Blog{
+			Title: "Some New Title",
+			Post:  "This is a new post",
+		},
+	})
 
 	// getBlog(conn, &blogpb.GetBlogRequest{
 	// 	BlogId: "5efc038b73cd517b65e735ed",
@@ -65,10 +73,11 @@ func updateBlog(conn *grpc.ClientConn, req *blogpb.UpdateBlogRequest) error {
 	c := blogpb.NewBlogServiceClient(conn)
 
 	res, err := c.UpdateBlog(context.Background(), req)
+	fmt.Println(res, err)
 	if err != nil {
 		return err
 	}
-	fmt.Println(res)
+
 	return nil
 }
 
