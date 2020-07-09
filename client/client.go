@@ -26,7 +26,7 @@ func main() {
 	createBlog(conn, req)
 	createBlog(conn, req)
 	createBlog(conn, req)
-	// getBlog(conn, &blogpb.GetBlogRequest{BlogId: "1"})
+
 	getBlog(conn, &blogpb.GetBlogRequest{BlogId: "1"})
 
 	updateBlog(conn, &blogpb.UpdateBlogRequest{
@@ -37,13 +37,8 @@ func main() {
 		},
 	})
 
-	// getBlog(conn, &blogpb.GetBlogRequest{
-	// 	BlogId: "5efc038b73cd517b65e735ed",
-	// })
-
-	//updateBlog(conn, req)
-
-	// deleteBlog(conn, &blogpb.DeleteBlogRequest{BlogId: "5efc038b73cd517b65e735ee"})
+	deleteBlog(conn, &blogpb.DeleteBlogRequest{BlogId: "1"})
+	deleteBlog(conn, &blogpb.DeleteBlogRequest{BlogId: "1"})
 
 }
 
