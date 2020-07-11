@@ -10,6 +10,7 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 )
 
@@ -157,6 +158,7 @@ func (s *server) DeleteBlog(ctx context.Context, req *blogpb.DeleteBlogRequest) 
 }
 
 func main() {
+	// Database Initialization
 	dbCred := dbCredentials{
 		host:     "postgres",
 		port:     5432,
@@ -177,12 +179,19 @@ func main() {
 	}
 	fmt.Println("table created")
 
+	// gRPC Server
+
+	creds, err := credentials.NewServerTLSFromFile("server.crt", "server.pem")
+	if err != nil {
+		log.Fatalf("unable to create credentials: %v", err)
+	}
+
 	li, err := net.Listen("tcp", ":5000")
 	if err != nil {
 		log.Fatalf("unable to create listener: %v", err)
 	}
 
-	s := grpc.NewServer()
+	s := grpc.NewServer(grpc.Creds(creds))
 	blogpb.RegisterBlogServiceServer(s, &server{db: db})
 	defer db.Close()
 	err = s.Serve(li)
