@@ -7,10 +7,12 @@ import (
 	"log"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 func main() {
-	conn, err := grpc.Dial("localhost:5000", grpc.WithInsecure())
+	creds, _ := credentials.NewClientTLSFromFile("ca.crt", "")
+	conn, err := grpc.Dial("localhost:5000", grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Fatalln("unable to dial grpc server: ", err)
 	}
