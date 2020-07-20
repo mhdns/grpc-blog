@@ -1,1 +1,1 @@
-DELETE FROM user WHERE id=$1;
+DELETE FROM user_table WHERE id=$1;
