@@ -2,6 +2,7 @@ package main
 
 import (
 	"blog/server/blogpb"
+	"blog/userpb"
 	"database/sql"
 	"fmt"
 	"log"
@@ -41,7 +42,14 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("table created")
+	fmt.Println("blog table created...")
+
+	createUserTable := readSQL("queries/create_user_table.sql")
+	_, err = db.Exec(createUserTable)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("user table created...")
 
 	// gRPC Server
 
@@ -57,6 +65,7 @@ func main() {
 
 	s := grpc.NewServer(grpc.Creds(creds))
 	blogpb.RegisterBlogServiceServer(s, &server{db: db})
+	userpb.RegisterUserServiceServer(s, &server{db: db})
 	defer db.Close()
 	err = s.Serve(li)
 	if err != nil {
