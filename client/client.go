@@ -2,7 +2,6 @@ package main
 
 import (
 	"blog/blogpb"
-	"blog/server/userpb"
 	"context"
 	"fmt"
 	"log"
@@ -20,25 +19,25 @@ func main() {
 	defer conn.Close()
 
 	// User portion
-	createUser(conn, &userpb.CreateUserRequest{
+	createUser(conn, &blogpb.CreateUserRequest{
 		Email:    "abc@gmail.com",
 		Name:     "Ang Beng Chong",
 		Password: "123456",
 	})
 
-	getUser(conn, &userpb.GetUserRequest{
+	getUser(conn, &blogpb.GetUserRequest{
 		UserId: "1",
 	})
 
-	updateUser(conn, &userpb.UpdateUserRequest{
+	updateUser(conn, &blogpb.UpdateUserRequest{
 		UserId: "1",
-		User: &userpb.User{
+		User: &blogpb.User{
 			Id:   "1",
 			Name: "Ang Beng Cheng",
 		},
 	})
 
-	deleteUser(conn, &userpb.DeleteUserRequest{
+	deleteUser(conn, &blogpb.DeleteUserRequest{
 		UserId: "1",
 	})
 	// Blog portion
@@ -113,8 +112,8 @@ func deleteBlog(conn *grpc.ClientConn, req *blogpb.DeleteBlogRequest) error {
 	return nil
 }
 
-func createUser(conn *grpc.ClientConn, req *userpb.CreateUserRequest) error {
-	c := userpb.NewUserServiceClient(conn)
+func createUser(conn *grpc.ClientConn, req *blogpb.CreateUserRequest) error {
+	c := blogpb.NewUserServiceClient(conn)
 
 	res, err := c.CreateUser(context.Background(), req)
 	if err != nil {
@@ -124,8 +123,8 @@ func createUser(conn *grpc.ClientConn, req *userpb.CreateUserRequest) error {
 	return nil
 }
 
-func getUser(conn *grpc.ClientConn, req *userpb.GetUserRequest) error {
-	c := userpb.NewUserServiceClient(conn)
+func getUser(conn *grpc.ClientConn, req *blogpb.GetUserRequest) error {
+	c := blogpb.NewUserServiceClient(conn)
 
 	res, err := c.GetUser(context.Background(), req)
 	if err != nil {
@@ -135,8 +134,8 @@ func getUser(conn *grpc.ClientConn, req *userpb.GetUserRequest) error {
 	return nil
 }
 
-func updateUser(conn *grpc.ClientConn, req *userpb.UpdateUserRequest) error {
-	c := userpb.NewUserServiceClient(conn)
+func updateUser(conn *grpc.ClientConn, req *blogpb.UpdateUserRequest) error {
+	c := blogpb.NewUserServiceClient(conn)
 
 	res, err := c.UpdateUser(context.Background(), req)
 	if err != nil {
@@ -146,8 +145,8 @@ func updateUser(conn *grpc.ClientConn, req *userpb.UpdateUserRequest) error {
 	return nil
 }
 
-func deleteUser(conn *grpc.ClientConn, req *userpb.DeleteUserRequest) error {
-	c := userpb.NewUserServiceClient(conn)
+func deleteUser(conn *grpc.ClientConn, req *blogpb.DeleteUserRequest) error {
+	c := blogpb.NewUserServiceClient(conn)
 
 	res, err := c.DeleteUser(context.Background(), req)
 	if err != nil {

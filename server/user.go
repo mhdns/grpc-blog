@@ -1,13 +1,13 @@
 package main
 
 import (
-	"blog/server/userpb"
+	"blog/server/blogpb"
 	"context"
 	"fmt"
 	"log"
 )
 
-func (s *server) CreateUser(ctx context.Context, req *userpb.CreateUserRequest) (*userpb.CreateUserResponse, error) {
+func (s *server) CreateUser(ctx context.Context, req *blogpb.CreateUserRequest) (*blogpb.CreateUserResponse, error) {
 	name := req.GetName()
 	email := req.GetEmail()
 	password := req.GetPassword()
@@ -34,8 +34,8 @@ func (s *server) CreateUser(ctx context.Context, req *userpb.CreateUserRequest) 
 		log.Fatal(err)
 	}
 
-	return &userpb.CreateUserResponse{
-		User: &userpb.User{
+	return &blogpb.CreateUserResponse{
+		User: &blogpb.User{
 			Id:   createdID,
 			Name: createdName,
 		},
@@ -44,10 +44,10 @@ func (s *server) CreateUser(ctx context.Context, req *userpb.CreateUserRequest) 
 	}, nil
 }
 
-func (s *server) GetUser(ctx context.Context, req *userpb.GetUserRequest) (*userpb.GetUserResponse, error) {
+func (s *server) GetUser(ctx context.Context, req *blogpb.GetUserRequest) (*blogpb.GetUserResponse, error) {
 	id := req.GetUserId()
 
-	query := readSQL("queries/get_user.sql")
+	query := readSQL("queries/get_user_id.sql")
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
 		log.Fatal(err)
@@ -57,13 +57,13 @@ func (s *server) GetUser(ctx context.Context, req *userpb.GetUserRequest) (*user
 
 	var returnedID, returnedName, returnedEmail, returnedPW, returnedSalt string
 
-	err = row.Scan(returnedID, returnedName, returnedEmail, returnedPW, returnedSalt)
+	err = row.Scan(&returnedID, &returnedName, &returnedEmail, &returnedPW, &returnedSalt)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &userpb.GetUserResponse{
-		User: &userpb.User{
+	return &blogpb.GetUserResponse{
+		User: &blogpb.User{
 			Id:   returnedID,
 			Name: returnedName,
 		},
@@ -72,7 +72,7 @@ func (s *server) GetUser(ctx context.Context, req *userpb.GetUserRequest) (*user
 	}, nil
 }
 
-func (s *server) UpdateUser(ctx context.Context, req *userpb.UpdateUserRequest) (*userpb.UpdateUserResponse, error) {
+func (s *server) UpdateUser(ctx context.Context, req *blogpb.UpdateUserRequest) (*blogpb.UpdateUserResponse, error) {
 	id := req.GetUserId()
 	newName := req.GetUser().GetName()
 
@@ -86,13 +86,13 @@ func (s *server) UpdateUser(ctx context.Context, req *userpb.UpdateUserRequest) 
 
 	var returnedID, returnedName string
 
-	err = row.Scan(returnedID, returnedName)
+	err = row.Scan(&returnedID, &returnedName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &userpb.UpdateUserResponse{
-		User: &userpb.User{
+	return &blogpb.UpdateUserResponse{
+		User: &blogpb.User{
 			Id:   returnedID,
 			Name: returnedName,
 		},
@@ -101,9 +101,9 @@ func (s *server) UpdateUser(ctx context.Context, req *userpb.UpdateUserRequest) 
 	}, nil
 }
 
-func (s *server) DeleteUser(ctx context.Context, req *userpb.DeleteUserRequest) (*userpb.DeleteUserResponse, error) {
+func (s *server) DeleteUser(ctx context.Context, req *blogpb.DeleteUserRequest) (*blogpb.DeleteUserResponse, error) {
 	id := req.GetUserId()
-	query := readSQL("query/delete_user.sql")
+	query := readSQL("queries/delete_user.sql")
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
@@ -114,7 +114,7 @@ func (s *server) DeleteUser(ctx context.Context, req *userpb.DeleteUserRequest) 
 	result, err := stmt.ExecContext(ctx, id)
 
 	rowsAffected, _ := result.RowsAffected()
-	return &userpb.DeleteUserResponse{
+	return &blogpb.DeleteUserResponse{
 		Msg:     fmt.Sprintf("deleted %v user", rowsAffected),
 		Success: true,
 	}, nil

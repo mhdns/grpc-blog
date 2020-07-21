@@ -2,7 +2,6 @@ package main
 
 import (
 	"blog/server/blogpb"
-	"blog/userpb"
 	"database/sql"
 	"fmt"
 	"log"
@@ -64,8 +63,9 @@ func main() {
 	}
 
 	s := grpc.NewServer(grpc.Creds(creds))
-	blogpb.RegisterBlogServiceServer(s, &server{db: db})
-	userpb.RegisterUserServiceServer(s, &server{db: db})
+	blogServer := &server{db: db}
+	blogpb.RegisterBlogServiceServer(s, blogServer)
+	blogpb.RegisterUserServiceServer(s, blogServer)
 	defer db.Close()
 	err = s.Serve(li)
 	if err != nil {
