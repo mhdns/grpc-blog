@@ -18,20 +18,13 @@ func (s *server) CreateUser(ctx context.Context, req *blogpb.CreateUserRequest) 
 	// Generate hashed pw
 	hashedPassword := password
 
-	query := readSQL("queries/create_user.sql")
-	stmt, err := s.db.Prepare(query)
+	row := s.createUser.QueryRowContext(ctx, email, name, hashedPassword, salt)
+
+	var createdID, createdName, createdEmail string
+
+	err := row.Scan(&createdID, &createdName, &createdEmail)
 	if err != nil {
-		log.Fatal(err)
-	}
-	defer stmt.Close()
-
-	row := stmt.QueryRowContext(ctx, email, name, hashedPassword, salt)
-
-	var createdID, createdName string
-
-	err = row.Scan(&createdID, &createdName)
-	if err != nil {
-		log.Fatal(err)
+		log.Fatal("create user:", err)
 	}
 
 	return &blogpb.CreateUserResponse{
@@ -47,17 +40,11 @@ func (s *server) CreateUser(ctx context.Context, req *blogpb.CreateUserRequest) 
 func (s *server) GetUser(ctx context.Context, req *blogpb.GetUserRequest) (*blogpb.GetUserResponse, error) {
 	id := req.GetUserId()
 
-	query := readSQL("queries/get_user_id.sql")
-	stmt, err := s.db.Prepare(query)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	row := stmt.QueryRowContext(ctx, id)
+	row := s.getUserByID.QueryRowContext(ctx, id)
 
 	var returnedID, returnedName, returnedEmail, returnedPW, returnedSalt string
 
-	err = row.Scan(&returnedID, &returnedName, &returnedEmail, &returnedPW, &returnedSalt)
+	err := row.Scan(&returnedID, &returnedName, &returnedEmail, &returnedPW, &returnedSalt)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -76,17 +63,11 @@ func (s *server) UpdateUser(ctx context.Context, req *blogpb.UpdateUserRequest) 
 	id := req.GetUserId()
 	newName := req.GetUser().GetName()
 
-	query := readSQL("queries/update_user.sql")
-	stmt, err := s.db.Prepare(query)
-	if err != nil {
-		log.Fatal(err)
-	}
+	row := s.updateUser.QueryRowContext(ctx, id, newName, "random@something.com")
 
-	row := stmt.QueryRowContext(ctx, id, newName, "random@something.com")
+	var returnedID, returnedName, returnedEmail string
 
-	var returnedID, returnedName string
-
-	err = row.Scan(&returnedID, &returnedName)
+	err := row.Scan(&returnedID, &returnedName, &returnedEmail)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -103,15 +84,11 @@ func (s *server) UpdateUser(ctx context.Context, req *blogpb.UpdateUserRequest) 
 
 func (s *server) DeleteUser(ctx context.Context, req *blogpb.DeleteUserRequest) (*blogpb.DeleteUserResponse, error) {
 	id := req.GetUserId()
-	query := readSQL("queries/delete_user.sql")
 
-	stmt, err := s.db.Prepare(query)
+	result, err := s.deleteUser.ExecContext(ctx, id)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer stmt.Close()
-
-	result, err := stmt.ExecContext(ctx, id)
 
 	rowsAffected, _ := result.RowsAffected()
 	return &blogpb.DeleteUserResponse{

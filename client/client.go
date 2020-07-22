@@ -41,29 +41,29 @@ func main() {
 		UserId: "1",
 	})
 	// Blog portion
-	// req := &blogpb.CreateBlogRequest{
-	// 	Blog: &blogpb.Blog{
-	// 		Title: "First Blog - Anas",
-	// 		Post:  "This is my first blog. I hope everyone likes it. If you get to read it, good for you!!!!!",
-	// 	},
-	// }
+	req := &blogpb.CreateBlogRequest{
+		Blog: &blogpb.Blog{
+			Title: "First Blog - Anas",
+			Post:  "This is my first blog. I hope everyone likes it. If you get to read it, good for you!!!!!",
+		},
+	}
 
-	// createBlog(conn, req)
-	// createBlog(conn, req)
-	// createBlog(conn, req)
+	createBlog(conn, req)
+	createBlog(conn, req)
+	createBlog(conn, req)
 
-	// getBlog(conn, &blogpb.GetBlogRequest{BlogId: "1"})
+	getBlog(conn, &blogpb.GetBlogRequest{BlogId: "1"})
 
-	// updateBlog(conn, &blogpb.UpdateBlogRequest{
-	// 	BlogId: "1",
-	// 	Blog: &blogpb.Blog{
-	// 		Title: "Some New Title",
-	// 		Post:  "This is a new post",
-	// 	},
-	// })
+	updateBlog(conn, &blogpb.UpdateBlogRequest{
+		BlogId: "1",
+		Blog: &blogpb.Blog{
+			Title: "Some New Title",
+			Post:  "This is a new post",
+		},
+	})
 
-	// deleteBlog(conn, &blogpb.DeleteBlogRequest{BlogId: "1"})
-	// deleteBlog(conn, &blogpb.DeleteBlogRequest{BlogId: "1"})
+	deleteBlog(conn, &blogpb.DeleteBlogRequest{BlogId: "1"})
+	deleteBlog(conn, &blogpb.DeleteBlogRequest{BlogId: "1"})
 
 }
 

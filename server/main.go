@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -18,7 +19,7 @@ type blog struct {
 }
 
 type server struct {
-	db *sql.DB
+	createBlog, createUser, getBlog, getUserByID, getUserByEmail, updateBlog, updateUser, deleteBlog, deleteUser *sql.Stmt
 }
 
 func main() {
@@ -36,19 +37,77 @@ func main() {
 	}
 	log.Println("Connected to DB!")
 
+	// Create Blog and User tables
+	ctx := context.Background()
+
 	createBlogTable := readSQL("queries/create_table.sql")
-	_, err = db.Exec(createBlogTable)
+	_, err = db.ExecContext(ctx, createBlogTable)
 	if err != nil {
 		fmt.Println(err)
 	}
 	fmt.Println("blog table created...")
 
 	createUserTable := readSQL("queries/create_user_table.sql")
-	_, err = db.Exec(createUserTable)
+	_, err = db.ExecContext(ctx, createUserTable)
 	if err != nil {
 		fmt.Println(err)
 	}
 	fmt.Println("user table created...")
+
+	// Create STMTs
+	createBlogStmt, err := db.Prepare(createBlog)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer createBlogStmt.Close()
+
+	createUserStmt, err := db.Prepare(createUser)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer createUserStmt.Close()
+
+	getBlogStmt, err := db.Prepare(getBlog)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer getBlogStmt.Close()
+
+	getUserByIDStmt, err := db.Prepare(getUserByID)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer getUserByIDStmt.Close()
+
+	getUserByEmailStmt, err := db.Prepare(getUserByEmail)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer getUserByEmailStmt.Close()
+
+	updateBlogStmt, err := db.Prepare(updateBlog)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer updateBlogStmt.Close()
+
+	updateUserStmt, err := db.Prepare(updateUser)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer updateUserStmt.Close()
+
+	deleteBlogStmt, err := db.Prepare(deleteBlog)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer deleteBlogStmt.Close()
+
+	deleteUserStmt, err := db.Prepare(deleteUser)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer deleteUserStmt.Close()
 
 	// gRPC Server
 
@@ -63,7 +122,17 @@ func main() {
 	}
 
 	s := grpc.NewServer(grpc.Creds(creds))
-	blogServer := &server{db: db}
+	blogServer := &server{
+		createBlog:     createBlogStmt,
+		createUser:     createUserStmt,
+		getBlog:        getBlogStmt,
+		getUserByID:    getUserByIDStmt,
+		getUserByEmail: getUserByEmailStmt,
+		updateBlog:     updateBlogStmt,
+		updateUser:     updateUserStmt,
+		deleteBlog:     deleteBlogStmt,
+		deleteUser:     deleteUserStmt,
+	}
 	blogpb.RegisterBlogServiceServer(s, blogServer)
 	blogpb.RegisterUserServiceServer(s, blogServer)
 	defer db.Close()

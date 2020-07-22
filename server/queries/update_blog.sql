@@ -1,1 +1,0 @@
-UPDATE blog SET title=$2, post=$3 WHERE id=$1 RETURNING id, title, created_at, post;
