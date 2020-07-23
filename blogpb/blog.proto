@@ -19,7 +19,7 @@ message CreateBlogResponse {
   bool success = 3;
 }
 
-message GetBlogRequest { string blogId = 1; }
+message GetBlogRequest { string blog_id = 1; }
 
 message GetBlogResponse {
   Blog blog = 1;
@@ -28,7 +28,7 @@ message GetBlogResponse {
 }
 
 message UpdateBlogRequest {
-  string blogId = 1;
+  string blog_id = 1;
   Blog blog = 2;
 }
 
@@ -38,7 +38,7 @@ message UpdateBlogResponse {
   bool success = 3;
 }
 
-message DeleteBlogRequest { string blogId = 1; }
+message DeleteBlogRequest { string blog_id = 1; }
 
 message DeleteBlogResponse {
   string msg = 2;
@@ -55,6 +55,7 @@ service BlogService {
 message User {
   string id = 1;
   string name = 2;
+  string email = 3;
 }
 
 message CreateUserRequest {
@@ -64,31 +65,31 @@ message CreateUserRequest {
 }
 
 message CreateUserResponse {
-  User User = 1;
+  User user = 1;
   string msg = 2;
   bool success = 3;
 }
 
-message GetUserRequest { string UserId = 1; }
+message GetUserRequest { string user_id = 1; }
 
 message GetUserResponse {
-  User User = 1;
+  User user = 1;
   string msg = 2;
   bool success = 3;
 }
 
 message UpdateUserRequest {
-  string UserId = 1;
-  User User = 2;
+  string user_id = 1;
+  User user = 2;
 }
 
 message UpdateUserResponse {
-  User User = 1;
+  User user = 1;
   string msg = 2;
   bool success = 3;
 }
 
-message DeleteUserRequest { string UserId = 1; }
+message DeleteUserRequest { string user_id = 1; }
 
 message DeleteUserResponse {
   string msg = 2;
