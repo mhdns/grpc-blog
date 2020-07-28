@@ -22,6 +22,11 @@ type server struct {
 	createBlog, createUser, getBlog, getUserByID, getUserByEmail, updateBlog, updateUser, deleteBlog, deleteUser *sql.Stmt
 }
 
+func unaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	log.Println("--> unary interceptor", info.FullMethod)
+	return handler(ctx, req)
+}
+
 func main() {
 	// Database Initialization
 	dbCred := dbCredentials{
@@ -40,14 +45,12 @@ func main() {
 	// Create Blog and User tables
 	ctx := context.Background()
 
-	createBlogTable := readSQL("queries/create_table.sql")
 	_, err = db.ExecContext(ctx, createBlogTable)
 	if err != nil {
 		fmt.Println(err)
 	}
 	fmt.Println("blog table created...")
 
-	createUserTable := readSQL("queries/create_user_table.sql")
 	_, err = db.ExecContext(ctx, createUserTable)
 	if err != nil {
 		fmt.Println(err)
@@ -121,7 +124,10 @@ func main() {
 		log.Fatalf("unable to create listener: %v", err)
 	}
 
-	s := grpc.NewServer(grpc.Creds(creds))
+	s := grpc.NewServer(
+		grpc.Creds(creds),
+		grpc.UnaryInterceptor(unaryInterceptor),
+	)
 	blogServer := &server{
 		createBlog:     createBlogStmt,
 		createUser:     createUserStmt,
