@@ -3,8 +3,12 @@ package main
 import (
 	"blog/server/blogpb"
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func (s *server) CreateUser(ctx context.Context, req *blogpb.CreateUserRequest) (*blogpb.CreateUserResponse, error) {
@@ -34,6 +38,31 @@ func (s *server) CreateUser(ctx context.Context, req *blogpb.CreateUserRequest) 
 		},
 		Msg:     "Created user successfully",
 		Success: true,
+	}, nil
+}
+
+func (s *server) LoginUser(ctx context.Context, req *blogpb.LoginUserRequest) (*blogpb.LoginUserResponse, error) {
+
+	email := req.GetEmail()
+
+	row := s.getUserByEmail.QueryRowContext(ctx, email)
+
+	var returnedID, returnedName, returnedEmail, returnedPW, returnedSalt string
+
+	err := row.Scan(&returnedID, &returnedName, &returnedEmail, &returnedPW, &returnedSalt)
+	if err == sql.ErrNoRows {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid credentials")
+	} else if err != nil {
+		log.Fatal(err)
+	}
+
+	if req.GetPassword() != returnedPW {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid credentials")
+	}
+
+	return &blogpb.LoginUserResponse{
+		Msg:     "login successful",
+		Success: "true",
 	}, nil
 }
 

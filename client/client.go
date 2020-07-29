@@ -28,6 +28,21 @@ func main() {
 		Password: "123456",
 	})
 
+	loginUser(conn, &blogpb.LoginUserRequest{
+		Email:    "abc@gmail.com",
+		Password: "123456",
+	})
+
+	loginUser(conn, &blogpb.LoginUserRequest{
+		Email:    "abcd@gmail.com",
+		Password: "123456",
+	})
+
+	loginUser(conn, &blogpb.LoginUserRequest{
+		Email:    "abcd@gmail.com",
+		Password: "1234567",
+	})
+
 	getUser(conn, &blogpb.GetUserRequest{
 		UserId: "1",
 	})
@@ -156,5 +171,16 @@ func deleteUser(conn *grpc.ClientConn, req *blogpb.DeleteUserRequest) error {
 		return err
 	}
 	fmt.Println(res)
+	return nil
+}
+
+func loginUser(conn *grpc.ClientConn, req *blogpb.LoginUserRequest) error {
+	c := blogpb.NewUserServiceClient(conn)
+
+	res, err := c.LoginUser(context.Background(), req)
+	if err != nil {
+		print(err)
+	}
+	fmt.Println(res, err)
 	return nil
 }

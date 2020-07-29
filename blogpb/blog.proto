@@ -96,9 +96,20 @@ message DeleteUserResponse {
   bool success = 3;
 }
 
+message LoginUserRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginUserResponse {
+  string msg = 1;
+  string success = 2;
+}
+
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {};
   rpc GetUser(GetUserRequest) returns (GetUserResponse) {};
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {};
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {};
+  rpc LoginUser(LoginUserRequest) returns (LoginUserResponse) {};
 }
