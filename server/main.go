@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -142,6 +144,13 @@ func main() {
 	blogpb.RegisterBlogServiceServer(s, blogServer)
 	blogpb.RegisterUserServiceServer(s, blogServer)
 	defer db.Close()
+
+	mux := runtime.NewServeMux()
+
+	blogpb.RegisterUserServiceHandlerServer(context.Background(), mux, blogServer)
+
+	http.Serve(li, mux)
+
 	err = s.Serve(li)
 	if err != nil {
 		log.Fatalf("unable to server grpc server: %v", err)

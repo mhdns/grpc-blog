@@ -4,6 +4,8 @@ package blogpb;
 
 option go_package = "/blogpb";
 
+import "google/api/annotations.proto";
+
 message Blog {
   string id = 1;
   string title = 2;
@@ -107,8 +109,18 @@ message LoginUserResponse {
 }
 
 service UserService {
-  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {};
-  rpc GetUser(GetUserRequest) returns (GetUserResponse) {};
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      post : "/register"
+      body : "*"
+    };
+  };
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {
+    option (google.api.http) = {
+      post : "/login"
+      body : "*"
+    };
+  };
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {};
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {};
   rpc LoginUser(LoginUserRequest) returns (LoginUserResponse) {};

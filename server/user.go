@@ -42,11 +42,11 @@ func (s *server) CreateUser(ctx context.Context, req *blogpb.CreateUserRequest) 
 }
 
 func (s *server) LoginUser(ctx context.Context, req *blogpb.LoginUserRequest) (*blogpb.LoginUserResponse, error) {
-
+	fmt.Println("Hello 1")
 	email := req.GetEmail()
-
+	fmt.Println("Hello 2")
 	row := s.getUserByEmail.QueryRowContext(ctx, email)
-
+	fmt.Println("Hello 3")
 	var returnedID, returnedName, returnedEmail, returnedPW, returnedSalt string
 
 	err := row.Scan(&returnedID, &returnedName, &returnedEmail, &returnedPW, &returnedSalt)
@@ -67,13 +67,14 @@ func (s *server) LoginUser(ctx context.Context, req *blogpb.LoginUserRequest) (*
 }
 
 func (s *server) GetUser(ctx context.Context, req *blogpb.GetUserRequest) (*blogpb.GetUserResponse, error) {
+	fmt.Println("Hello 1")
 	id := req.GetUserId()
-
+	fmt.Printf("id = %v", id)
 	row := s.getUserByID.QueryRowContext(ctx, id)
 
 	var returnedID, returnedName, returnedEmail, returnedPW, returnedSalt string
 
-	err := row.Scan(&returnedID, &returnedName, &returnedEmail, &returnedPW, &returnedSalt)
+	err := row.Scan(&returnedID, &returnedEmail, &returnedName, &returnedPW, &returnedSalt)
 	if err != nil {
 		log.Fatal(err)
 	}
